@@ -1,0 +1,116 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f7f9fb;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+.main-header {
+  background: linear-gradient(90deg, #0099cc, #0077aa);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.navbar {
+  margin-top: 0.8rem;
+}
+
+.navbar button {
+  background: white;
+  color: #0077aa;
+  border: none;
+  padding: 0.6rem 1rem;
+  margin: 0.3rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.navbar button:hover {
+  background: #0077aa;
+  color: white;
+}
+
+.main-content {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+.form-section, .tabla-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+form input, form button {
+  margin: 0.3rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+form button {
+  background: #0077aa;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+form button:hover {
+  background: #005f88;
+}
+
+.btn-secundario {
+  background: #ccc !important;
+  color: #333 !important;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+table th, table td {
+  border-bottom: 1px solid #ddd;
+  padding: 0.7rem;
+  text-align: left;
+}
+
+table th {
+  background: #f0f0f0;
+}
+
+.btn-editar, .btn-eliminar {
+  border: none;
+  cursor: pointer;
+  background: none;
+  font-size: 1.2rem;
+}
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.paginacion button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.3rem;
+  background: #0077aa;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.paginacion button:hover {
+  background: #005f88;
+}
