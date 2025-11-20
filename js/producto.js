@@ -1,39 +1,31 @@
-const API_URL = "http://127.0.0.1:8000";
-let paginaProductos = 1;
-const LIMITE_PRODUCTOS = 5;
-
 async function cargarProductos() {
     const contenido = document.getElementById("contenido");
     contenido.innerHTML = `
-        <section class="form-section">
-            <h2>Gestión de Productos (Stock)</h2>
-            <form id="formProducto">
+        <section class="card">
+            <h3>📦 Gestión de Stock</h3>
+            <form id="formProducto" style="grid-template-columns: 2fr 1fr 1fr 1fr auto;">
                 <input type="hidden" id="idProducto">
-                <input type="text" id="nombre" placeholder="Nombre (Ej: Puerta Hierro)" required>
+                <input type="text" id="nombre" placeholder="Nombre del Producto" required>
                 <select id="tipo" required>
-                    <option value="">Seleccione Tipo</option>
+                    <option value="">Tipo</option>
                     <option value="Puerta">Puerta</option>
                     <option value="Ventana">Ventana</option>
                     <option value="Otro">Otro</option>
                 </select>
-                <input type="number" id="stock" placeholder="Stock Actual" required min="0">
+                <input type="number" id="stock" placeholder="Stock" required min="0">
                 <input type="number" step="0.01" id="precio" placeholder="Precio (Gs)" required>
-                <button type="submit">💾 Guardar</button>
-                <button type="button" id="cancelarEdicion" class="btn-secundario">❌ Limpiar</button>
+                <div style="display:flex; gap:0.5rem">
+                    <button type="submit">Guardar</button>
+                    <button type="button" id="cancelarEdicion" class="btn-secundario">Limpiar</button>
+                </div>
             </form>
         </section>
 
-        <section class="tabla-section">
-            <h2>Inventario</h2>
-            <table>
+        <section class="card">
+            <h3>Inventario Actual</h3>
+            <table id="tablaProductosContainer">
                 <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Tipo</th>
-                        <th>Stock</th>
-                        <th>Precio</th>
-                        <th>Acciones</th>
-                    </tr>
+                    <tr><th>Producto</th><th>Tipo</th><th>Stock</th><th>Precio</th><th style="text-align:right">Acciones</th></tr>
                 </thead>
                 <tbody id="tablaProductos"></tbody>
             </table>
@@ -50,7 +42,7 @@ async function cargarProductos() {
             precio: parseFloat(document.getElementById("precio").value),
         };
         
-        const url = id ? `${API_URL}/productos/${id}` : `${API_URL}/productos/`;
+        const url = id ? `${API_URL.productos}${id}` : API_URL.productos;
         const method = id ? "PUT" : "POST";
 
         await fetch(url, {
@@ -73,22 +65,31 @@ async function cargarProductos() {
 }
 
 async function listarProductos() {
-    const res = await fetch(`${API_URL}/productos/`);
+    const res = await fetch(API_URL.productos);
     const productos = await res.json();
     const tabla = document.getElementById("tablaProductos");
     
-    tabla.innerHTML = productos.map(p => `
+    tabla.innerHTML = productos.map(p => {
+        let badgeClass = 'badge-success';
+        let stockLabel = 'En Stock';
+        if (p.stock === 0) { badgeClass = 'badge-danger'; stockLabel = 'Agotado'; }
+        else if (p.stock < 5) { badgeClass = 'badge-warning'; stockLabel = 'Bajo'; }
+
+        return `
         <tr>
-            <td>${p.nombre}</td>
-            <td>${p.tipo}</td>
-            <td style="font-weight:bold; color: ${p.stock < 5 ? 'red' : 'green'}">${p.stock}</td>
-            <td>${p.precio.toLocaleString("es-PY")}</td>
             <td>
-                <button class="btn-editar" onclick='editarProducto(${JSON.stringify(p)})'>✏️</button>
-                <button class="btn-eliminar" onclick='eliminarProducto(${p.id})'>🗑️</button>
+                <div style="font-weight:600">${p.nombre}</div>
+                <small style="color:var(--text-light)">ID: ${p.id}</small>
+            </td>
+            <td><span class="badge" style="background:#f1f5f9; color:#475569">${p.tipo}</span></td>
+            <td><span class="badge ${badgeClass}">${p.stock} (${stockLabel})</span></td>
+            <td>${p.precio.toLocaleString("es-PY")} ₲</td>
+            <td style="text-align:right">
+                <button class="btn-editar" style="background:none; border:none; cursor:pointer;" onclick='editarProducto(${JSON.stringify(p)})'>✏️</button>
+                <button class="btn-eliminar" style="background:none; border:none; cursor:pointer;" onclick='eliminarProducto(${p.id})'>🗑️</button>
             </td>
         </tr>
-    `).join("");
+    `}).join("");
 }
 
 window.editarProducto = (p) => {
@@ -97,12 +98,12 @@ window.editarProducto = (p) => {
     document.getElementById("tipo").value = p.tipo;
     document.getElementById("stock").value = p.stock;
     document.getElementById("precio").value = p.precio;
+    document.getElementById("nombre").focus();
 };
 
 window.eliminarProducto = async (id) => {
     if(confirm("¿Eliminar producto?")) {
-        await fetch(`${API_URL}/productos/${id}`, { method: "DELETE" });
+        await fetch(`${API_URL.productos}${id}`, { method: "DELETE" });
         listarProductos();
     }
 };
-window.cargarProductos = cargarProductos;

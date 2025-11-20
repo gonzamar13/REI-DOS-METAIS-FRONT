@@ -2,22 +2,40 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Rei Dos Metais - Gestión</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rei Dos Metais - Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  
+  <script src="js/config.js"></script>
+  
   <script defer src="js/clientes.js"></script>
-  <script defer src="js/productos.js"></script> <script defer src="js/ventas.js"></script>
+  <script defer src="js/productos.js"></script>
+  <script defer src="js/ventas.js"></script>
   <script defer src="js/app.js"></script>
 </head>
 <body>
-  <header class="main-header">
-    <h1>🛠️ REI DOS METAIS</h1>
-    <nav class="navbar">
-      <button data-section="clientes">👥 Clientes</button>
-      <button data-section="productos">🚪 Productos</button>
-      <button data-section="ventas">💰 Ventas</button>
-    </nav>
-  </header>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>🛠️ REI DOS METAIS</h1>
+      </div>
+      <nav class="navbar">
+        <button data-section="inicio" class="active">🏠 Inicio</button>
+        <button data-section="clientes">👥 Clientes</button>
+        <button data-section="productos">🚪 Productos</button>
+        <button data-section="ventas">💰 Ventas</button>
+      </nav>
+    </aside>
 
-  <main id="contenido" class="main-content"></main>
+    <main class="main-content">
+      <header class="top-bar">
+        <h2 id="titulo-seccion">Panel de Control</h2>
+        <div class="user-info">Admin 👤</div>
+      </header>
+      <div id="contenido" class="content-wrapper">
+        </div>
+    </main>
+  </div>
 </body>
 </html>

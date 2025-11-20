@@ -1,74 +1,82 @@
-let carrito = []; // Array para manejar múltiples productos en una venta
+let carrito = []; 
 
 async function cargarVentas() {
     const contenido = document.getElementById("contenido");
     contenido.innerHTML = `
-        <section class="form-section">
-            <h2>Registrar Nueva Venta</h2>
-            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                <select id="clienteVenta" style="flex:1;"></select>
-                <select id="formaPago" style="flex:1;">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                </select>
+        <div class="ventas-layout">
+            <div style="display:flex; flex-direction:column; gap: 1.5rem;">
+                <section class="card">
+                    <h3>1. Datos de Venta</h3>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                        <select id="clienteVenta"></select>
+                        <select id="formaPago">
+                            <option value="Efectivo">💵 Efectivo</option>
+                            <option value="Transferencia">🏦 Transferencia</option>
+                            <option value="Tarjeta">💳 Tarjeta</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="card" style="flex:1;">
+                    <h3>2. Agregar Productos</h3>
+                    <div style="display:flex; gap:10px; align-items:end; background: #f8fafc; padding:1rem; border-radius:8px; border:1px solid var(--border);">
+                        <div style="flex:1;">
+                            <label style="font-size:0.85rem; color:var(--text-light)">Producto</label>
+                            <select id="productoSelect" style="margin-top:0.3rem;"></select>
+                        </div>
+                        <div style="width:80px;">
+                            <label style="font-size:0.85rem; color:var(--text-light)">Cant.</label>
+                            <input type="number" id="cantidadInput" value="1" min="1" style="margin-top:0.3rem;">
+                        </div>
+                        <button type="button" id="btnAgregar" class="btn-primary">➕ Añadir</button>
+                    </div>
+                    
+                    <div style="margin-top:2rem;">
+                        <h3>📜 Historial Reciente</h3>
+                        <table id="historialVentas">
+                            <thead><tr><th>Cliente</th><th>Total</th><th>Fecha</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
-            
-            <div style="background:#f0f0f0; padding:10px; border-radius:5px;">
-                <h4>Agregar Ítems</h4>
-                <div style="display:flex; gap:10px;">
-                    <select id="productoSelect" style="flex:2;"></select>
-                    <input type="number" id="cantidadInput" value="1" min="1" style="width:60px;">
-                    <button type="button" id="btnAgregar" style="background:#28a745;">➕ Agregar</button>
+
+            <section class="carrito-panel">
+                <div>
+                    <h3 style="border-bottom:1px solid var(--border); padding-bottom:1rem;">🛒 Carrito</h3>
+                    <div style="overflow-y:auto; max-height: 400px;">
+                        <table style="margin-top:10px;">
+                            <tbody id="tablaCarrito"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-
-            <table style="margin-top:10px;">
-                <thead><tr><th>Producto</th><th>Cant</th><th>Subtotal</th><th></th></tr></thead>
-                <tbody id="tablaCarrito"></tbody>
-            </table>
-            <h3 style="text-align:right">Total: <span id="totalVenta">0</span> Gs</h3>
-
-            <button id="btnFinalizarVenta" style="width:100%; margin-top:10px;">💾 CONFIRMAR VENTA</button>
-        </section>
-
-        <section class="tabla-section">
-            <h2>Historial de Ventas</h2>
-            <table id="historialVentas">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Detalle</th>
-                        <th>Pago</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
+                <div style="border-top:1px solid var(--border); padding-top:1rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:1.2rem;">
+                        <span>Total:</span>
+                        <span id="totalVenta" style="font-weight:bold; color:var(--primary);">0 Gs</span>
+                    </div>
+                    <button id="btnFinalizarVenta" style="width:100%; margin-top:1rem; background: var(--success);">✅ CONFIRMAR VENTA</button>
+                </div>
+            </section>
+        </div>
     `;
 
     await cargarSelectores();
     listarVentas();
 
-    // Lógica del Carrito
     document.getElementById("btnAgregar").addEventListener("click", () => {
         const select = document.getElementById("productoSelect");
         const id = parseInt(select.value);
-        const nombre = select.options[select.selectedIndex].text;
+        if (!id) return alert("Seleccione un producto");
+        
+        const nombre = select.options[select.selectedIndex].text.split(" (Stock")[0];
         const precio = parseFloat(select.options[select.selectedIndex].dataset.precio);
         const cant = parseInt(document.getElementById("cantidadInput").value);
 
-        if (!id) return alert("Seleccione un producto");
-
-        // Buscar si ya existe en carrito para sumar
         const existente = carrito.find(i => i.producto_id === id);
-        if (existente) {
-            existente.cantidad += cant;
-        } else {
-            carrito.push({ producto_id: id, nombre, precio, cantidad: cant });
-        }
+        if (existente) existente.cantidad += cant;
+        else carrito.push({ producto_id: id, nombre, precio, cantidad: cant });
+        
         renderCarrito();
     });
 
@@ -82,7 +90,7 @@ async function cargarVentas() {
             detalles: carrito.map(c => ({ producto_id: c.producto_id, cantidad: c.cantidad }))
         };
 
-        const res = await fetch(`${API_URL}/ventas/`, {
+        const res = await fetch(API_URL.ventas, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(venta)
@@ -95,7 +103,7 @@ async function cargarVentas() {
             listarVentas();
         } else {
             const error = await res.json();
-            alert("Error: " + error.detail);
+            alert("Error: " + (error.detail || "Error desconocido"));
         }
     });
 }
@@ -103,55 +111,56 @@ async function cargarVentas() {
 function renderCarrito() {
     const tbody = document.getElementById("tablaCarrito");
     let total = 0;
+    
+    if (carrito.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-light);">Vacío</td></tr>';
+        document.getElementById("totalVenta").innerText = "0 Gs";
+        return;
+    }
+
     tbody.innerHTML = carrito.map((item, index) => {
         const sub = item.precio * item.cantidad;
         total += sub;
-        return `<tr>
-            <td>${item.nombre}</td>
-            <td>${item.cantidad}</td>
-            <td>${sub.toLocaleString("es-PY")}</td>
-            <td><button onclick="eliminarDelCarrito(${index})" style="background:red; padding:2px 5px;">x</button></td>
+        return `
+        <tr>
+            <td>
+                <div style="font-weight:600">${item.nombre}</div>
+                <small>${item.cantidad} x ${item.precio.toLocaleString()}</small>
+            </td>
+            <td style="text-align:right;">${sub.toLocaleString("es-PY")}</td>
+            <td style="text-align:right;"><button onclick="eliminarDelCarrito(${index})" style="color:red; border:none; background:none; cursor:pointer;">&times;</button></td>
         </tr>`;
     }).join("");
-    document.getElementById("totalVenta").innerText = total.toLocaleString("es-PY");
+    document.getElementById("totalVenta").innerText = total.toLocaleString("es-PY") + " Gs";
 }
 
-window.eliminarDelCarrito = (index) => {
-    carrito.splice(index, 1);
-    renderCarrito();
-};
+window.eliminarDelCarrito = (index) => { carrito.splice(index, 1); renderCarrito(); };
 
 async function cargarSelectores() {
     const [resC, resP] = await Promise.all([
-        fetch(`${API_URL}/clientes/`),
-        fetch(`${API_URL}/productos/`)
+        fetch(API_URL.clientes),
+        fetch(API_URL.productos)
     ]);
     const clientes = await resC.json();
     const productos = await resP.json();
 
-    const selC = document.getElementById("clienteVenta");
-    selC.innerHTML = "<option value=''>-- Cliente --</option>" + clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
-
-    const selP = document.getElementById("productoSelect");
-    selP.innerHTML = "<option value=''>-- Producto --</option>" + productos.map(p => 
+    document.getElementById("clienteVenta").innerHTML = "<option value=''>-- Cliente --</option>" + clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
+    
+    document.getElementById("productoSelect").innerHTML = "<option value=''>-- Producto --</option>" + productos.map(p => 
         `<option value="${p.id}" data-precio="${p.precio}">${p.nombre} (Stock: ${p.stock})</option>`
     ).join("");
 }
 
 async function listarVentas() {
-    const res = await fetch(`${API_URL}/ventas/`);
+    const res = await fetch(API_URL.ventas);
     const ventas = await res.json();
-    const tbody = document.querySelector("#historialVentas tbody");
+    const ultimas = ventas.slice(-5).reverse();
     
-    tbody.innerHTML = ventas.map(v => `
+    document.querySelector("#historialVentas tbody").innerHTML = ultimas.map(v => `
         <tr>
-            <td>${new Date(v.fecha).toLocaleDateString()}</td>
             <td>${v.cliente.nombre}</td>
-            <td>${v.detalles.map(d => `${d.cantidad} x ${d.producto_nombre}`).join(", ")}</td>
-            <td>${v.forma_de_pago}</td>
-            <td>${v.total.toLocaleString("es-PY")} Gs</td>
+            <td style="font-weight:bold;">${v.total.toLocaleString("es-PY")}</td>
+            <td style="font-size:0.8rem; color:grey;">${new Date(v.fecha).toLocaleDateString()}</td>
         </tr>
     `).join("");
 }
-
-window.cargarVentas = cargarVentas;
