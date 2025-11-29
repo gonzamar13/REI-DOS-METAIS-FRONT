@@ -12,8 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
             Seleccione una opción del menú lateral para comenzar a administrar Clientes, Inventario y Ventas.
         </p>
         <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
-            <button onclick="cargarVentas()" class="btn-primary">💰 Nueva Venta</button>
-            <button onclick="cargarProductos()" class="btn-secundario">📦 Ver Stock</button>
+              <button onclick="irAVentas()" class="btn-primary">💰 Nueva Venta</button>
+              <button onclick="irAProductos()" class="btn-secundario">📦 Ver Stock</button>
         </div>
       </div>
     `;
@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarInicio();
   
   // Exponer funciones al contexto global para los botones de inicio
-  window.cargarVentas = () => { document.querySelector('[data-section="ventas"]').click(); };
-  window.cargarProductos = () => { document.querySelector('[data-section="productos"]').click(); };
+// CAMBIO: Renombrar para no sobrescribir las funciones originales de lógica
+window.irAVentas = () => { document.querySelector('[data-section="ventas"]').click(); };
+window.irAProductos = () => { document.querySelector('[data-section="productos"]').click(); };
 });
